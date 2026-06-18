@@ -1,26 +1,32 @@
-# Use an official PHP runtime with Apache
+# Use PHP 8.2 with Apache
 FROM php:8.2-apache
 
-# Install system dependencies and PostgreSQL drivers
+# Install system dependencies and PostgreSQL driver
 RUN apt-get update && apt-get install -y \
     libpq-dev \
+    git \
+    unzip \
     && docker-php-ext-install pdo pdo_pgsql
 
-# Enable Apache mod_rewrite and set the document root
-RUN a2enmod rewrite
-RUN echo "DirectoryIndex index.php" >> /etc/apache2/apache2.conf
+# Install Composer (dependency manager)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set the DocumentRoot to your public folder
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
+
+# Set DocumentRoot to public folder
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 
-# Set the working directory
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy the application files into the container
+# Copy all files
 COPY . .
+
+# Install PHP dependencies using Composer
+RUN composer install --optimize-autoloader --no-dev
 
 # Expose port 80
 EXPOSE 80
 
-# Start Apache
 CMD ["apache2-foreground"]
