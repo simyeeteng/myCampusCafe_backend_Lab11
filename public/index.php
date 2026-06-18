@@ -11,7 +11,7 @@ require __DIR__ . '/../src/db.php';
 require __DIR__ . '/../src/security.php';
 
 $app = AppFactory::create();
-$app->setBasePath('/mycampus-cafe-slim-api/public');
+//$app->setBasePath('/mycampus-cafe-slim-api/public');
 
 // Middleware: parse JSON/form request body.
 $app->addBodyParsingMiddleware();
