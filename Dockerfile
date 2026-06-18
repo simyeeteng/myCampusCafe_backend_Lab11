@@ -20,11 +20,14 @@ RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /et
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy all files
-COPY . .
+# Copy composer files first (for better caching)
+COPY composer.json composer.lock ./
 
-# Install PHP dependencies using Composer
-RUN composer install --optimize-autoloader --no-dev
+# Install dependencies
+RUN composer install --optimize-autoloader --no-dev --verbose
+
+# Copy the rest of the application
+COPY . .
 
 # Expose port 80
 EXPOSE 80
